@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promozioni Giornaliere</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background-color: #f4f4f4;
+        }
+        .promo-bar {
+            display: flex;
+            justify-content: space-between;
+            background-color: #ff9000;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            color: white;
+        }
+        .promo-bar h3 {
+            margin: 0;
+            font-size: 1.2em;
+        }
+        .promo-bar p {
+            margin: 0;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Promozioni Giornaliere</h1>
+    <div id="promozioni"></div>
+
+    <script>
+        function caricaPromozioni() {
+            const promozioniDiv = document.getElementById('promozioni');
+            promozioniDiv.innerHTML = '<p>Caricamento promozioni...</p>';
+
+            // URL JSON del foglio Google Sheets
+            const jsonUrl = 'https://spreadsheets.google.com/feeds/list/1wRQjXsQz86Ac1zPKPYi38tiRzyYwSOBbfPCu9doSAQo/od6/public/values?alt=json';
+
+            fetch(jsonUrl)
+                .then(response => response.json())
+                .then(data => {
+                    const promozioni = data.feed.entry;
+                    promozioniDiv.innerHTML = '';  // Svuota la div prima di aggiungere i dati
+
+                    promozioni.forEach(entry => {
+                        const giorno = entry.gsx$giorno.$t;
+                        const promozione = entry.gsx$promozione.$t;
+
+                        promozioniDiv.innerHTML += `
+                            <div class="promo-bar">
+                                <h3>${giorno}</h3>
+                                <p>${promozione}</p>
+                            </div>`;
+                    });
+                })
+                .catch(error => {
+                    console.error('Errore nel caricamento del JSON:', error);
+                    promozioniDiv.innerHTML = '<p class="error">Errore nel caricamento delle promozioni.</p>';
+                });
+        }
+
+        // Carica le promozioni all'avvio della pagina
+        caricaPromozioni();
+    </script>
+</body>
+</html>
